@@ -94,6 +94,6 @@ CI (`.github/workflows/tests.yml`) runs `composer setup` and then `composer ci:c
 
 ## Known gaps and cautions
 
-- The building and tariff web pages are public by design; the dashboard remains behind `auth` + `verified`. The API building and tariff routes are also unauthenticated; add authorization before exposing them beyond this assessment.
+- The dashboard, building, and tariff web pages are public by design. The API building and tariff routes are also unauthenticated; add authorization before exposing them beyond this assessment.
 - Do not commit `.env`, `vendor`, `node_modules`, build output, or Wayfinder-generated directories.
 - `AGENTS.md` is tracked in this repository; keep it updated when commands or architecture change.

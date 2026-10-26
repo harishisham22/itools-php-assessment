@@ -5,10 +5,7 @@ use App\Http\Controllers\TariffController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
-});
+Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
 Route::resource('buildings', BuildingController::class)->except('show');
 Route::resource('tariffs', TariffController::class)->except('show');
