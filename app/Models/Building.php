@@ -7,13 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Table('buildings')]
-#[Table(key: 'id')]
 class Building extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
-        'customer_uuid',
+        'customer_name',
         'type',
         'month',
         'usability',
@@ -27,9 +26,4 @@ class Building extends Model
         'updated_at',
         'deleted_at'
     ];
-
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
-    }
 }
