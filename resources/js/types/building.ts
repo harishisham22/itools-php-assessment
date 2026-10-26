@@ -21,6 +21,7 @@ export type BuildingFormData = {
 export type BuildingFilters = {
     type: string | null;
     state: string | null;
+    month: number | null;
     sort_by: string | null;
     direction: 'asc' | 'desc';
 };

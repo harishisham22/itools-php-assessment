@@ -46,12 +46,14 @@ defineOptions({
 
 const selectedType = ref(props.filters.type ?? 'all');
 const selectedState = ref(props.filters.state ?? 'all');
+const selectedMonth = ref<number | 'all'>(props.filters.month ?? 'all');
 
 watch(
     () => props.filters,
     (filters) => {
         selectedType.value = filters.type ?? 'all';
         selectedState.value = filters.state ?? 'all';
+        selectedMonth.value = filters.month ?? 'all';
     },
     { deep: true },
 );
@@ -79,6 +81,10 @@ const applyFilters = (
         query.state = selectedState.value;
     }
 
+    if (selectedMonth.value !== 'all') {
+        query.month = String(selectedMonth.value);
+    }
+
     const sortBy = overrides.sort_by ?? props.filters.sort_by;
     const direction = overrides.direction ?? props.filters.direction;
 
@@ -101,6 +107,11 @@ const updateType = (value: unknown) => {
 
 const updateState = (value: unknown) => {
     selectedState.value = String(value);
+    applyFilters();
+};
+
+const updateMonth = (value: unknown) => {
+    selectedMonth.value = value === 'all' ? 'all' : Number(value);
     applyFilters();
 };
 
@@ -203,6 +214,33 @@ const sortIcon = (column: 'type' | 'usability') => {
                                     :value="state.value"
                                 >
                                     {{ state.label }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="filter-month" class="sr-only">
+                            Filter by month
+                        </Label>
+                        <Select
+                            :model-value="selectedMonth"
+                            @update:model-value="updateMonth"
+                        >
+                            <SelectTrigger
+                                id="filter-month"
+                                class="w-full sm:w-44"
+                            >
+                                <SelectValue placeholder="All months" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All months</SelectItem>
+                                <SelectItem
+                                    v-for="month in months"
+                                    :key="month.value"
+                                    :value="month.value"
+                                >
+                                    {{ month.label }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>

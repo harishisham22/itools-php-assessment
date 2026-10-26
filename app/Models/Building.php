@@ -16,7 +16,7 @@ class Building extends Model
         'month',
         'usability',
         'state',
-        'bill'
+        'bill',
     ];
 
     /**
@@ -33,6 +33,14 @@ class Building extends Model
     public function scopeOfState(Builder $query, ?string $state): Builder
     {
         return $query->when($state, fn ($q) => $q->where('state', $state));
+    }
+
+    /**
+     * Scope a query to filter by month.
+     */
+    public function scopeOfMonth(Builder $query, ?int $month): Builder
+    {
+        return $query->when($month, fn ($q) => $q->where('month', $month));
     }
 
     /**
