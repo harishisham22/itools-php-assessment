@@ -34,13 +34,13 @@ class BuildingController extends Controller
             $q->where('state', $request->input('state'));
         });
 
-        $sortBy = $request->input('sort_by'); // Expects 'type' or 'usability'
+        $sortBy = $request->input('sort_by');
         $direction = strtolower($request->input('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (in_array($sortBy, ['type', 'usability'])) {
             $query->orderBy($sortBy, $direction);
         } else {
-            $query->orderBy('created_at', 'desc');
+            $query->latest();
         }
 
         return BuildingResource::collection($query->get());
