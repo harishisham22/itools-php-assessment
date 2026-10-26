@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Building extends Model
@@ -20,10 +19,32 @@ class Building extends Model
         'bill'
     ];
 
-    protected $guarded = [
-        'id',
-        'created_at',
-        'updated_at',
-        'deleted_at'
-    ];
+    /**
+     * Scope a query to filter by building type.
+     */
+    public function scopeOfType(Builder $query, ?string $type): Builder
+    {
+        return $query->when($type, fn ($q) => $q->where('type', $type));
+    }
+
+    /**
+     * Scope a query to filter by state.
+     */
+    public function scopeOfState(Builder $query, ?string $state): Builder
+    {
+        return $query->when($state, fn ($q) => $q->where('state', $state));
+    }
+
+    /**
+     * Scope a query to sort by allowed columns (type, usability).
+     */
+    public function scopeSortBy(Builder $query, ?string $column, string $direction = 'asc'): Builder
+    {
+        $allowedColumns = ['type', 'usability'];
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->when(in_array($column, $allowedColumns), function ($q) use ($column, $direction) {
+            $q->orderBy($column, $direction);
+        });
+    }
 }
