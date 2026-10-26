@@ -22,6 +22,7 @@ export type BuildingFilters = {
     type: string | null;
     state: string | null;
     month: number | null;
+    search: string | null;
     sort_by: string | null;
     direction: 'asc' | 'desc';
 };

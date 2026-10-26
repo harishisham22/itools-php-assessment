@@ -32,6 +32,7 @@ class BuildingController extends Controller
         $month = filter_var($request->query('month'), FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1, 'max_range' => 12],
         ]);
+        $search = $request->query('search');
         $sortBy = $request->query('sort_by');
         $direction = $request->query('direction', 'asc');
 
@@ -39,6 +40,7 @@ class BuildingController extends Controller
             'type' => is_string($type) && $type !== '' ? $type : null,
             'state' => is_string($state) && $state !== '' ? $state : null,
             'month' => $month === false ? null : $month,
+            'search' => is_string($search) && trim($search) !== '' ? trim($search) : null,
             'sort_by' => is_string($sortBy) && $sortBy !== '' ? $sortBy : null,
             'direction' => is_string($direction) && strtolower($direction) === 'desc' ? 'desc' : 'asc',
         ];
@@ -47,6 +49,7 @@ class BuildingController extends Controller
             ->ofType($filters['type'])
             ->ofState($filters['state'])
             ->ofMonth($filters['month'])
+            ->searchCustomer($filters['search'])
             ->sortBy($filters['sort_by'], $filters['direction'])
             ->orderBy('id')
             ->get();

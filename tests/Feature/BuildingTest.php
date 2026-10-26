@@ -72,6 +72,27 @@ class BuildingTest extends TestCase
                 ->where('filters.month', 7));
     }
 
+    public function test_buildings_index_can_be_searched_by_customer_name()
+    {
+        Building::create($this->buildingAttributes([
+            'customer_name' => 'Ahmad',
+        ]));
+
+        Building::create($this->buildingAttributes([
+            'customer_name' => 'Siti',
+        ]));
+
+        $response = $this->get(route('buildings.index', ['search' => 'Ahm']));
+
+        $response
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('buildings/Index')
+                ->has('buildings', 1)
+                ->where('buildings.0.customer_name', 'Ahmad')
+                ->where('filters.search', 'Ahm'));
+    }
+
     public function test_create_building_page_can_be_rendered()
     {
         $response = $this->get(route('buildings.create'));

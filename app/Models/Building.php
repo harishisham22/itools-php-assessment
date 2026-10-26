@@ -44,6 +44,17 @@ class Building extends Model
     }
 
     /**
+     * Scope a query to search by customer name.
+     */
+    public function scopeSearchCustomer(Builder $query, ?string $search): Builder
+    {
+        return $query->when(
+            $search,
+            fn ($q) => $q->where('customer_name', 'like', "%{$search}%"),
+        );
+    }
+
+    /**
      * Scope a query to sort by allowed columns (type, usability).
      */
     public function scopeSortBy(Builder $query, ?string $column, string $direction = 'asc'): Builder

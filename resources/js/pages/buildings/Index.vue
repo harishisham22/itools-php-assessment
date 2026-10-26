@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from '@lucide/vue';
+import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 import DeleteBuildingDialog from '@/components/DeleteBuildingDialog.vue';
 import Heading from '@/components/Heading.vue';
@@ -13,6 +14,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -47,6 +49,7 @@ defineOptions({
 const selectedType = ref(props.filters.type ?? 'all');
 const selectedState = ref(props.filters.state ?? 'all');
 const selectedMonth = ref<number | 'all'>(props.filters.month ?? 'all');
+const search = ref(props.filters.search ?? '');
 
 watch(
     () => props.filters,
@@ -56,6 +59,19 @@ watch(
         selectedMonth.value = filters.month ?? 'all';
     },
     { deep: true },
+);
+
+watch(
+    () => props.filters.search,
+    (value) => {
+        const isSearchFocused =
+            typeof document !== 'undefined' &&
+            document.activeElement?.id === 'search-customer';
+
+        if (!isSearchFocused) {
+            search.value = value ?? '';
+        }
+    },
 );
 
 const typeLabels = computed(
@@ -85,6 +101,12 @@ const applyFilters = (
         query.month = String(selectedMonth.value);
     }
 
+    const searchValue = search.value.trim();
+
+    if (searchValue !== '') {
+        query.search = searchValue;
+    }
+
     const sortBy = overrides.sort_by ?? props.filters.sort_by;
     const direction = overrides.direction ?? props.filters.direction;
 
@@ -98,6 +120,14 @@ const applyFilters = (
         preserveScroll: true,
         replace: true,
     });
+};
+
+const runSearch = useDebounceFn(() => {
+    applyFilters();
+}, 300);
+
+const onSearchInput = () => {
+    runSearch();
 };
 
 const updateType = (value: unknown) => {
@@ -164,7 +194,20 @@ const sortIcon = (column: 'type' | 'usability') => {
             </CardHeader>
 
             <CardContent class="space-y-4">
-                <div class="flex flex-col gap-3 sm:flex-row">
+                <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <div class="grid w-full gap-2 sm:w-72">
+                        <Label for="search-customer" class="sr-only">
+                            Search by customer name
+                        </Label>
+                        <Input
+                            id="search-customer"
+                            v-model="search"
+                            type="search"
+                            placeholder="Search customer name..."
+                            @input="onSearchInput"
+                        />
+                    </div>
+
                     <div class="grid gap-2">
                         <Label for="filter-type" class="sr-only">
                             Filter by building type
