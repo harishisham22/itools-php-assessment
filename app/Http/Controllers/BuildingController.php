@@ -39,7 +39,7 @@ class BuildingController extends Controller
     /**
      * Show the form for creating a new building.
      */
-    public function create(StoreBuildingRequest $request)
+    public function create()
     {
         //TODO: create building form
     }
