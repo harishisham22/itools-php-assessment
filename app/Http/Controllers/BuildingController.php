@@ -24,26 +24,16 @@ class BuildingController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Building::query();
+        $buildings = Building::query()
+            ->ofType($request->input('type'))
+            ->ofState($request->input('state'))
+            ->sortBy(
+                $request->input('sort_by'),
+                $request->input('direction', 'asc')
+            )
+            ->get();
 
-        $query->when($request->filled('type'), function ($q) use ($request) {
-            $q->where('type', $request->input('type'));
-        });
-
-        $query->when($request->filled('state'), function ($q) use ($request) {
-            $q->where('state', $request->input('state'));
-        });
-
-        $sortBy = $request->input('sort_by');
-        $direction = strtolower($request->input('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
-
-        if (in_array($sortBy, ['type', 'usability'])) {
-            $query->orderBy($sortBy, $direction);
-        } else {
-            $query->latest();
-        }
-
-        return BuildingResource::collection($query->get());
+        return BuildingResource::collection($buildings);
     }
 
     /**
