@@ -4,6 +4,7 @@ import { Plus } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import DeleteTariffDialog from '@/components/DeleteTariffDialog.vue';
 import Heading from '@/components/Heading.vue';
+import Pagination from '@/components/Pagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,10 +24,10 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency, formatKwhRange } from '@/lib/format';
 import { create, edit, index } from '@/routes/tariffs';
-import type { SelectOption, Tariff, TariffFilters } from '@/types';
+import type { Paginated, SelectOption, Tariff, TariffFilters } from '@/types';
 
 const props = defineProps<{
-    tariffs: Tariff[];
+    tariffs: Paginated<Tariff>;
     filters: TariffFilters;
     buildingTypes: SelectOption[];
 }>();
@@ -100,8 +101,8 @@ const updateBuildingType = (value: unknown) => {
             <CardHeader>
                 <CardTitle>Tariff tiers</CardTitle>
                 <CardDescription>
-                    {{ tariffs.length }}
-                    {{ tariffs.length === 1 ? 'tier' : 'tiers' }}
+                    {{ tariffs.total }}
+                    {{ tariffs.total === 1 ? 'tier' : 'tiers' }}
                     in the current view.
                 </CardDescription>
             </CardHeader>
@@ -173,7 +174,7 @@ const updateBuildingType = (value: unknown) => {
 
                         <tbody>
                             <tr
-                                v-for="tariff in tariffs"
+                                v-for="tariff in tariffs.data"
                                 :key="tariff.id"
                                 class="border-t transition-colors hover:bg-muted/50"
                             >
@@ -241,7 +242,7 @@ const updateBuildingType = (value: unknown) => {
                                 </td>
                             </tr>
 
-                            <tr v-if="tariffs.length === 0">
+                            <tr v-if="tariffs.data.length === 0">
                                 <td
                                     colspan="6"
                                     class="px-4 py-10 text-center text-muted-foreground"
@@ -253,6 +254,8 @@ const updateBuildingType = (value: unknown) => {
                         </tbody>
                     </table>
                 </div>
+
+                <Pagination :paginator="tariffs" />
             </CardContent>
         </Card>
     </div>

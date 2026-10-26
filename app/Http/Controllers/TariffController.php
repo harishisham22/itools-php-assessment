@@ -39,14 +39,19 @@ class TariffController extends Controller
             ->orderByDesc('is_initial_rate')
             ->orderBy('min_kwh')
             ->orderBy('id')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         if ($this->isApiRequest($request)) {
             return TariffResource::collection($tariffs);
         }
 
+        $tariffs->through(
+            fn (Tariff $tariff): array => TariffResource::make($tariff)->resolve($request),
+        );
+
         return Inertia::render('tariffs/Index', [
-            'tariffs' => TariffResource::collection($tariffs)->resolve($request),
+            'tariffs' => $tariffs,
             'filters' => $filters,
             ...$this->formOptions(),
         ]);

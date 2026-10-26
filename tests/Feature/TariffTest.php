@@ -29,8 +29,9 @@ class TariffTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('tariffs/Index')
-                ->has('tariffs', 1)
-                ->where('tariffs.0.category', 'For the first 100 kWh')
+                ->has('tariffs.data', 1)
+                ->where('tariffs.data.0.category', 'For the first 100 kWh')
+                ->where('tariffs.total', 1)
                 ->where('filters.building_type', null)
                 ->has('buildingTypes', count(BuildingType::cases())));
     }
@@ -52,8 +53,8 @@ class TariffTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('tariffs/Index')
-                ->has('tariffs', 1)
-                ->where('tariffs.0.category', 'Commercial first tier')
+                ->has('tariffs.data', 1)
+                ->where('tariffs.data.0.category', 'Commercial first tier')
                 ->where('filters.building_type', BuildingType::COMMERCIAL->value));
     }
 
@@ -130,6 +131,39 @@ class TariffTest extends TestCase
         $response->assertSessionHasErrors('min_kwh');
 
         $this->assertDatabaseCount('tariffs', 1);
+    }
+
+    public function test_tariffs_index_is_paginated()
+    {
+        foreach (range(1, 12) as $index) {
+            Tariff::create($this->tariffAttributes([
+                'category' => "Tier {$index}",
+                'min_kwh' => $index * 10,
+                'max_kwh' => $index * 10 + 9,
+                'is_initial_rate' => $index === 1,
+            ]));
+        }
+
+        $firstPage = $this->get(route('tariffs.index'));
+
+        $firstPage
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('tariffs/Index')
+                ->has('tariffs.data', 10)
+                ->where('tariffs.current_page', 1)
+                ->where('tariffs.last_page', 2)
+                ->where('tariffs.per_page', 10)
+                ->where('tariffs.total', 12));
+
+        $secondPage = $this->get(route('tariffs.index', ['page' => 2]));
+
+        $secondPage
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('tariffs/Index')
+                ->has('tariffs.data', 2)
+                ->where('tariffs.current_page', 2));
     }
 
     public function test_a_tariff_can_be_deleted()

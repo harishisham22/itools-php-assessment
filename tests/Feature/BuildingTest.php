@@ -40,9 +40,10 @@ class BuildingTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('buildings/Index')
-                ->has('buildings', 1)
-                ->where('buildings.0.customer_name', 'Ahmad')
-                ->where('buildings.0.bill', fn ($bill): bool => abs((float) $bill - 100) < 0.001)
+                ->has('buildings.data', 1)
+                ->where('buildings.data.0.customer_name', 'Ahmad')
+                ->where('buildings.data.0.bill', fn ($bill): bool => abs((float) $bill - 100) < 0.001)
+                ->where('buildings.total', 1)
                 ->where('filters.type', null)
                 ->has('types', count(BuildingType::cases()))
                 ->has('states', count(State::cases()))
@@ -67,8 +68,8 @@ class BuildingTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('buildings/Index')
-                ->has('buildings', 1)
-                ->where('buildings.0.customer_name', 'July building')
+                ->has('buildings.data', 1)
+                ->where('buildings.data.0.customer_name', 'July building')
                 ->where('filters.month', 7));
     }
 
@@ -88,8 +89,8 @@ class BuildingTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('buildings/Index')
-                ->has('buildings', 1)
-                ->where('buildings.0.customer_name', 'Ahmad')
+                ->has('buildings.data', 1)
+                ->where('buildings.data.0.customer_name', 'Ahmad')
                 ->where('filters.search', 'Ahm'));
     }
 
@@ -174,6 +175,56 @@ class BuildingTest extends TestCase
         $response->assertRedirect(route('buildings.index'));
 
         $this->assertSoftDeleted($building);
+    }
+
+    public function test_buildings_index_is_paginated()
+    {
+        foreach (range(1, 12) as $index) {
+            Building::create($this->buildingAttributes([
+                'customer_name' => "Building {$index}",
+            ]));
+        }
+
+        $firstPage = $this->get(route('buildings.index'));
+
+        $firstPage
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('buildings/Index')
+                ->has('buildings.data', 10)
+                ->where('buildings.current_page', 1)
+                ->where('buildings.last_page', 2)
+                ->where('buildings.per_page', 10)
+                ->where('buildings.total', 12));
+
+        $secondPage = $this->get(route('buildings.index', ['page' => 2]));
+
+        $secondPage
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('buildings/Index')
+                ->has('buildings.data', 2)
+                ->where('buildings.current_page', 2));
+    }
+
+    public function test_buildings_pagination_keeps_filters()
+    {
+        foreach (range(1, 11) as $index) {
+            Building::create($this->buildingAttributes([
+                'customer_name' => "Ahmad {$index}",
+            ]));
+        }
+
+        $response = $this->get(route('buildings.index', ['search' => 'Ahmad']));
+
+        $response
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('buildings.total', 11)
+                ->where(
+                    'buildings.next_page_url',
+                    fn (?string $url): bool => is_string($url) && str_contains($url, 'search=Ahmad'),
+                ));
     }
 
     /**

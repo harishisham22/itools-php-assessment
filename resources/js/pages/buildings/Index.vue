@@ -5,6 +5,7 @@ import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 import DeleteBuildingDialog from '@/components/DeleteBuildingDialog.vue';
 import Heading from '@/components/Heading.vue';
+import Pagination from '@/components/Pagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,10 +26,15 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency, formatNumber } from '@/lib/format';
 import { create, edit, index } from '@/routes/buildings';
-import type { Building, BuildingFilters, SelectOption } from '@/types';
+import type {
+    Building,
+    BuildingFilters,
+    Paginated,
+    SelectOption,
+} from '@/types';
 
 const props = defineProps<{
-    buildings: Building[];
+    buildings: Paginated<Building>;
     filters: BuildingFilters;
     types: SelectOption[];
     states: SelectOption[];
@@ -187,8 +193,8 @@ const sortIcon = (column: 'type' | 'usability') => {
             <CardHeader>
                 <CardTitle>All buildings</CardTitle>
                 <CardDescription>
-                    {{ buildings.length }}
-                    {{ buildings.length === 1 ? 'building' : 'buildings' }}
+                    {{ buildings.total }}
+                    {{ buildings.total === 1 ? 'building' : 'buildings' }}
                     in the current view.
                 </CardDescription>
             </CardHeader>
@@ -353,7 +359,7 @@ const sortIcon = (column: 'type' | 'usability') => {
 
                         <tbody>
                             <tr
-                                v-for="building in buildings"
+                                v-for="building in buildings.data"
                                 :key="building.id"
                                 class="border-t transition-colors hover:bg-muted/50"
                             >
@@ -414,7 +420,7 @@ const sortIcon = (column: 'type' | 'usability') => {
                                 </td>
                             </tr>
 
-                            <tr v-if="buildings.length === 0">
+                            <tr v-if="buildings.data.length === 0">
                                 <td
                                     colspan="7"
                                     class="px-4 py-10 text-center text-muted-foreground"
@@ -426,6 +432,8 @@ const sortIcon = (column: 'type' | 'usability') => {
                         </tbody>
                     </table>
                 </div>
+
+                <Pagination :paginator="buildings" />
             </CardContent>
         </Card>
     </div>

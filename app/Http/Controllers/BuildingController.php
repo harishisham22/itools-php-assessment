@@ -52,14 +52,19 @@ class BuildingController extends Controller
             ->searchCustomer($filters['search'])
             ->sortBy($filters['sort_by'], $filters['direction'])
             ->orderBy('id')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         if ($this->isApiRequest($request)) {
             return BuildingResource::collection($buildings);
         }
 
+        $buildings->through(
+            fn (Building $building): array => BuildingResource::make($building)->resolve($request),
+        );
+
         return Inertia::render('buildings/Index', [
-            'buildings' => BuildingResource::collection($buildings)->resolve($request),
+            'buildings' => $buildings,
             'filters' => $filters,
             ...$this->formOptions(),
         ]);
