@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { Building2, LayoutGrid, LogIn, ReceiptText } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
-import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
@@ -14,8 +14,13 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, login } from '@/routes';
+import { index as buildingsIndex } from '@/routes/buildings';
+import { index as tariffsIndex } from '@/routes/tariffs';
 import type { NavItem } from '@/types';
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
 const mainNavItems: NavItem[] = [
     {
@@ -23,18 +28,15 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
-
-const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
+        title: 'Buildings',
+        href: buildingsIndex(),
+        icon: Building2,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
+        title: 'Tariffs',
+        href: tariffsIndex(),
+        icon: ReceiptText,
     },
 ];
 </script>
@@ -58,8 +60,17 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
-            <NavUser />
+            <NavUser v-if="user" />
+            <SidebarMenu v-else>
+                <SidebarMenuItem>
+                    <SidebarMenuButton as-child tooltip="Log in">
+                        <Link :href="login()">
+                            <LogIn />
+                            <span>Log in</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarMenu>
         </SidebarFooter>
     </Sidebar>
     <slot />

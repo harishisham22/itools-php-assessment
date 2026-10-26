@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "laravel/itools-php-skill-assessment",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "ITools PHP Skill Assessment Project.",
     "keywords": [
         "laravel",
         "framework"
@@ -14,6 +14,7 @@
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14"
     },
