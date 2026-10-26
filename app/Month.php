@@ -35,4 +35,25 @@ enum Month: string
             default => throw new \InvalidArgumentException("Invalid month number: {$number}"),
         };
     }
+
+    /**
+     * Get the numeric representation of the month.
+     */
+    public function number(): int
+    {
+        return match ($this) {
+            self::JANUARY => 1,
+            self::FEBRUARY => 2,
+            self::MARCH => 3,
+            self::APRIL => 4,
+            self::MAY => 5,
+            self::JUNE => 6,
+            self::JULY => 7,
+            self::AUGUST => 8,
+            self::SEPTEMBER => 9,
+            self::OCTOBER => 10,
+            self::NOVEMBER => 11,
+            self::DECEMBER => 12,
+        };
+    }
 }
