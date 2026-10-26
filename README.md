@@ -9,6 +9,9 @@ controllers expose a JSON API.
 - **Buildings** — create, edit, and soft-delete buildings. The list supports
   filtering by type, state, and month, searching by customer name, sorting by
   type or usage, and pagination (10 per page).
+- **Dashboard** — a public billing overview with total billed, building and
+  tariff counts, usage, average bill, a 12-month chart, a type breakdown, and
+  the five most recent buildings.
 - **Tariffs** — full CRUD for progressive tariff tiers per building type, with
   validation that tiers do not overlap. The list can be filtered by building
   type and is paginated (10 per page).
@@ -75,7 +78,7 @@ composer dev
 | Method    | URI                    | Description                   |
 | --------- | ---------------------- | ----------------------------- |
 | GET       | `/`                    | Welcome page                  |
-| GET       | `/dashboard`           | Dashboard (public)            |
+| GET       | `/dashboard`           | Billing overview (public)     |
 | GET       | `/buildings`           | Building list                 |
 | GET       | `/buildings/create`    | Create building form          |
 | POST      | `/buildings`           | Store building                |
@@ -201,11 +204,13 @@ lint, frontend type-check, and the PHP test suite.
 
 - `app/BuildingType.php`, `app/Month.php`, `app/State.php` — domain enums.
 - `app/Http/Controllers` — Inertia pages and API JSON, branching on
-  `$request->routeIs('api.*')`. `ReportController` also serves the reports page
-  and its JSON endpoints.
+  `$request->routeIs('api.*')`. `DashboardController` loads the overview and
+  `ReportController` serves the reports page and its JSON endpoints.
 - `app/Http/Requests` — validation, including tariff overlap checks.
 - `app/Http/Resources` — API response shaping.
 - `app/Service/TariffCalculator.php` — progressive bill calculation.
+- `app/Service/ReportBuilder.php` — shared bill aggregation used by the
+  dashboard and reports.
 - `resources/js/pages` — Inertia pages (`buildings/Index.vue` →
   `buildings/Index`), including `reports/Index.vue`.
 - `resources/js/components` — shared UI, including the pagination controls.

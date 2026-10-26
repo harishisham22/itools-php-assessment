@@ -58,10 +58,11 @@ CI (`.github/workflows/tests.yml`) runs `composer setup` and then `composer ci:c
 
 - `app/BuildingType.php`, `app/Month.php`, `app/State.php` — root-level backed enums in the `App\` namespace (not `App\Enums`). Keep new domain enums there and validate them with `Rule::enum(...)`.
 - `app/Models` — Eloquent models. `Building` and `Customer` use `SoftDeletes`; `Tariff` does not.
-- `app/Http/Controllers` — web and API controllers. `BuildingController` and `TariffController` serve both the Inertia pages and API JSON, branching on `$request->routeIs('api.*')`. `ReportController` serves the reports page and the `/api/reports` endpoints, sharing the same filters. API resource routes live in `routes/api.php`; web pages live in `routes/web.php`; auth and settings routes live in `routes/settings.php`.
+- `app/Http/Controllers` — web and API controllers. `BuildingController` and `TariffController` serve both the Inertia pages and API JSON, branching on `$request->routeIs('api.*')`. `ReportController` serves the reports page and the `/api/reports` endpoints, and `DashboardController` loads the dashboard overview; both use `ReportBuilder` for aggregates. API resource routes live in `routes/api.php`; web pages live in `routes/web.php`; auth and settings routes live in `routes/settings.php`.
 - `app/Http/Requests` — Form Requests own validation. Cross-field or business validation (for example, tariff tier overlap) belongs in `after()` hooks, not in controllers.
 - `app/Http/Resources` — JSON response shaping. Return resources from controller actions rather than raw models.
 - `app/Service/TariffCalculator.php` — static progressive tariff calculation. Buildings get their `bill` from this when created.
+- `app/Service/ReportBuilder.php` — shared bill aggregation (summary, by month, by type, by state) used by the dashboard and report endpoints.
 - `app/Concerns` — shared Fortify validation rules.
 - `database/migrations`, `database/seeders` — schema and sample data.
 

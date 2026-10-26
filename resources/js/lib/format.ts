@@ -19,3 +19,10 @@ export function formatKwhRange(min: number, max: number | null): string {
 
     return `${formatNumber(min)} – ${formatNumber(max)} kWh`;
 }
+
+export function formatEnumLabel(value: string): string {
+    return value
+        .split('_')
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}

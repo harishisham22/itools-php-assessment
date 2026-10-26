@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/vue3';
 import { Building2, ChartColumn, CircleDollarSign, Gauge } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
+import BillsByMonthChart from '@/components/BillsByMonthChart.vue';
 import Heading from '@/components/Heading.vue';
 import {
     Card,
@@ -92,12 +93,6 @@ const updateMonth = (value: unknown) => {
     applyFilters();
 };
 
-const hasData = computed(() => props.report.summary.buildings > 0);
-
-const maxMonthlyBill = computed(() =>
-    Math.max(...props.report.by_month.map((month) => month.bill), 1),
-);
-
 const maxTypeBill = computed(() =>
     Math.max(...props.report.by_type.map((type) => type.bill), 1),
 );
@@ -106,13 +101,8 @@ const stateRows = computed(() =>
     props.report.by_state.filter((state) => state.buildings > 0),
 );
 
-const monthlyBarHeight = (bill: number): string =>
-    bill <= 0 ? '0%' : `${Math.max((bill / maxMonthlyBill.value) * 100, 2)}%`;
-
 const typeBarWidth = (bill: number): string =>
     bill <= 0 ? '0%' : `${Math.max((bill / maxTypeBill.value) * 100, 2)}%`;
-
-const shortMonth = (label: string): string => label.slice(0, 3);
 </script>
 
 <template>
@@ -278,42 +268,7 @@ const shortMonth = (label: string): string => label.slice(0, 3);
             </CardHeader>
 
             <CardContent>
-                <p
-                    v-if="!hasData"
-                    class="py-10 text-center text-sm text-muted-foreground"
-                >
-                    No buildings match the current filters.
-                </p>
-
-                <div v-else class="flex gap-1 sm:gap-2">
-                    <div
-                        v-for="month in report.by_month"
-                        :key="month.month"
-                        class="flex min-w-0 flex-1 flex-col items-center"
-                    >
-                        <div class="flex h-48 w-full items-end">
-                            <div
-                                class="w-full rounded-t-md bg-primary/70 transition-colors hover:bg-primary"
-                                :style="{
-                                    height: monthlyBarHeight(month.bill),
-                                }"
-                                :title="`${month.label}: ${formatCurrency(month.bill)}`"
-                            ></div>
-                        </div>
-                        <span
-                            class="mt-2 text-[10px] text-muted-foreground sm:text-xs"
-                        >
-                            {{ shortMonth(month.label) }}
-                        </span>
-                    </div>
-                </div>
-
-                <p
-                    v-if="hasData"
-                    class="mt-2 text-right text-xs text-muted-foreground"
-                >
-                    Hover a bar to see its exact total.
-                </p>
+                <BillsByMonthChart :months="report.by_month" />
             </CardContent>
         </Card>
 
