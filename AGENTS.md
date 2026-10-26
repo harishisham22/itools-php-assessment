@@ -39,18 +39,18 @@ composer dev
 
 Run the narrowest relevant checks while iterating, and the full suite before finishing.
 
-| Area | Command |
-| --- | --- |
-| All PHP checks and tests | `composer test` |
-| PHP formatting (write) | `composer lint` |
-| PHP formatting (verify) | `composer lint:check` |
-| PHP static analysis | `composer types:check` |
-| PHP tests | `php artisan test` |
-| Single PHP test | `php artisan test --filter=DashboardTest` |
-| Frontend lint | `npm run check` |
-| Frontend lint (fix) | `npm run check:fix` |
-| Frontend type-check | `npm run types:check` |
-| Production build | `npm run build` |
+| Area                     | Command                                   |
+| ------------------------ | ----------------------------------------- |
+| All PHP checks and tests | `composer test`                           |
+| PHP formatting (write)   | `composer lint`                           |
+| PHP formatting (verify)  | `composer lint:check`                     |
+| PHP static analysis      | `composer types:check`                    |
+| PHP tests                | `php artisan test`                        |
+| Single PHP test          | `php artisan test --filter=DashboardTest` |
+| Frontend lint            | `npm run check`                           |
+| Frontend lint (fix)      | `npm run check:fix`                       |
+| Frontend type-check      | `npm run types:check`                     |
+| Production build         | `npm run build`                           |
 
 CI (`.github/workflows/tests.yml`) runs `composer setup` and then `composer ci:check` on PHP 8.5/Node 22. `composer ci:check` runs frontend lint, frontend type-check, and `composer test`.
 

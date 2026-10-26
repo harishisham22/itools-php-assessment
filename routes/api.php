@@ -9,5 +9,5 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::resource('buildings', BuildingController::class);
+Route::resource('buildings', BuildingController::class)->names('api.buildings');
 Route::resource('tariffs', TariffController::class);

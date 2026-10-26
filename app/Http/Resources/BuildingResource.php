@@ -15,12 +15,13 @@ class BuildingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'customer_name' => $this->resource->customer->name,
+            'id' => $this->resource->id,
+            'customer_name' => $this->resource->customer_name,
             'type' => $this->resource->type,
             'month' => $this->resource->month,
             'usability' => $this->resource->usability,
             'state' => $this->resource->state,
-            'bill' => $this->resource->bill
+            'bill' => $this->resource->bill,
         ];
     }
 }
