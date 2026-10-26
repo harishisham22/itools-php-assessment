@@ -38,6 +38,8 @@ class StoreTariffRequest extends FormRequest
 
     /**
      * Get the "after" validation hooks for the request.
+     *
+     * @return array<int, callable(Validator): void>
      */
     public function after(): array
     {
@@ -47,21 +49,23 @@ class StoreTariffRequest extends FormRequest
                     return;
                 }
 
-                $tariffModel = new Tariff();
+                $tariffModel = new Tariff;
 
                 $isValid = $tariffModel->validateNoOverlap(
-                    $this->input('building_type'),
-                    $this->input('min_kwh'),
-                    $this->input('max_kwh')
+                    (string) $this->input('building_type'),
+                    (int) $this->input('min_kwh'),
+                    $this->input('max_kwh') !== null
+                        ? (int) $this->input('max_kwh')
+                        : null
                 );
 
-                if (!$isValid) {
+                if (! $isValid) {
                     $validator->errors()->add(
                         'min_kwh',
                         'The specified kWh range overlaps with an existing tariff tier for this building type.'
                     );
                 }
-            }
+            },
         ];
     }
 }

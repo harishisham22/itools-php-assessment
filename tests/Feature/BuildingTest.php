@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\BuildingType;
 use App\Models\Building;
 use App\Models\Tariff;
-use App\Models\User;
 use App\State;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -22,11 +21,11 @@ class BuildingTest extends TestCase
         $this->withoutVite();
     }
 
-    public function test_guests_are_redirected_to_the_login_page()
+    public function test_buildings_index_is_publicly_accessible()
     {
         $response = $this->get(route('buildings.index'));
 
-        $response->assertRedirect(route('login'));
+        $response->assertOk();
     }
 
     public function test_buildings_index_can_be_rendered()
@@ -35,9 +34,7 @@ class BuildingTest extends TestCase
 
         Building::create($this->buildingAttributes(['bill' => 100]));
 
-        $response = $this
-            ->actingAs(User::factory()->create())
-            ->get(route('buildings.index'));
+        $response = $this->get(route('buildings.index'));
 
         $response
             ->assertOk()
@@ -54,9 +51,7 @@ class BuildingTest extends TestCase
 
     public function test_create_building_page_can_be_rendered()
     {
-        $response = $this
-            ->actingAs(User::factory()->create())
-            ->get(route('buildings.create'));
+        $response = $this->get(route('buildings.create'));
 
         $response
             ->assertOk()
@@ -71,9 +66,7 @@ class BuildingTest extends TestCase
     {
         $building = Building::create($this->buildingAttributes());
 
-        $response = $this
-            ->actingAs(User::factory()->create())
-            ->get(route('buildings.edit', $building));
+        $response = $this->get(route('buildings.edit', $building));
 
         $response
             ->assertOk()
@@ -87,15 +80,13 @@ class BuildingTest extends TestCase
     {
         $this->seedTariffs();
 
-        $response = $this
-            ->actingAs(User::factory()->create())
-            ->post(route('buildings.store'), [
-                'customer_name' => 'Ahmad',
-                'type' => BuildingType::RESIDENTIAL->value,
-                'month' => 6,
-                'usability' => 150,
-                'state' => State::SELANGOR->value,
-            ]);
+        $response = $this->post(route('buildings.store'), [
+            'customer_name' => 'Ahmad',
+            'type' => BuildingType::RESIDENTIAL->value,
+            'month' => 6,
+            'usability' => 150,
+            'state' => State::SELANGOR->value,
+        ]);
 
         $response->assertRedirect(route('buildings.index'));
 
@@ -114,15 +105,13 @@ class BuildingTest extends TestCase
             'bill' => 0,
         ]));
 
-        $response = $this
-            ->actingAs(User::factory()->create())
-            ->put(route('buildings.update', $building), [
-                'customer_name' => 'Ahmad Updated',
-                'type' => BuildingType::RESIDENTIAL->value,
-                'month' => 7,
-                'usability' => 150,
-                'state' => State::SELANGOR->value,
-            ]);
+        $response = $this->put(route('buildings.update', $building), [
+            'customer_name' => 'Ahmad Updated',
+            'type' => BuildingType::RESIDENTIAL->value,
+            'month' => 7,
+            'usability' => 150,
+            'state' => State::SELANGOR->value,
+        ]);
 
         $response->assertRedirect(route('buildings.index'));
 
@@ -136,9 +125,7 @@ class BuildingTest extends TestCase
     {
         $building = Building::create($this->buildingAttributes());
 
-        $response = $this
-            ->actingAs(User::factory()->create())
-            ->delete(route('buildings.destroy', $building));
+        $response = $this->delete(route('buildings.destroy', $building));
 
         $response->assertRedirect(route('buildings.index'));
 

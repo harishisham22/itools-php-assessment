@@ -58,7 +58,7 @@ CI (`.github/workflows/tests.yml`) runs `composer setup` and then `composer ci:c
 
 - `app/BuildingType.php`, `app/Month.php`, `app/State.php` — root-level backed enums in the `App\` namespace (not `App\Enums`). Keep new domain enums there and validate them with `Rule::enum(...)`.
 - `app/Models` — Eloquent models. `Building` and `Customer` use `SoftDeletes`; `Tariff` does not.
-- `app/Http/Controllers` — web and API controllers. API resource routes live in `routes/api.php`; auth and settings routes live in `routes/web.php` and `routes/settings.php`.
+- `app/Http/Controllers` — web and API controllers. `BuildingController` and `TariffController` serve both the Inertia pages and API JSON, branching on `$request->routeIs('api.*')`. API resource routes live in `routes/api.php`; web pages live in `routes/web.php`; auth and settings routes live in `routes/settings.php`.
 - `app/Http/Requests` — Form Requests own validation. Cross-field or business validation (for example, tariff tier overlap) belongs in `after()` hooks, not in controllers.
 - `app/Http/Resources` — JSON response shaping. Return resources from controller actions rather than raw models.
 - `app/Service/TariffCalculator.php` — static progressive tariff calculation. Buildings get their `bill` from this when created.
@@ -89,12 +89,11 @@ CI (`.github/workflows/tests.yml`) runs `composer setup` and then `composer ci:c
 - `BuildingType` and `State` use lowercase string enum values. `month` is stored as an integer from 1 to 12; `App\Month` converts to and from numbers.
 - Tariff tiers are progressive per `building_type`: `min_kwh` and `max_kwh` are inclusive, and `max_kwh = null` means no upper bound. Tiers for the same building type must not overlap.
 - `TariffCalculator::getBuildingBill()` orders the initial tier first, then by `min_kwh`, and charges each tier's rate for the kWh falling in that tier. Preserve this behavior and add tests when changing rates or tiers.
-- Creating a building calculates its `bill` from `type` and `usability`. Updating a building currently updates attributes only; recalculate `bill` if `type` or `usability` changes.
+- Creating and updating a building calculates its `bill` from `type` and `usability`. Recalculate it whenever either changes.
 - Tariff updates and deletes have TODOs to queue recalculation of affected buildings.
 
 ## Known gaps and cautions
 
-- `Building` stores a denormalized `customer_name`. The `Customer` model exists but `Building` has no `customer()` relation, while `BuildingResource` reads `$this->resource->customer->name`. Check this path before relying on building JSON responses.
-- The API resource routes for buildings and tariffs are currently unauthenticated; only `/api/user` uses `auth:sanctum`. Add authorization before exposing them.
+- The building and tariff web pages are public by design; the dashboard remains behind `auth` + `verified`. The API building and tariff routes are also unauthenticated; add authorization before exposing them beyond this assessment.
 - Do not commit `.env`, `vendor`, `node_modules`, build output, or Wayfinder-generated directories.
 - `AGENTS.md` is tracked in this repository; keep it updated when commands or architecture change.
