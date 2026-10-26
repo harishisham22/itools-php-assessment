@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Building2, LayoutGrid, LogIn, ReceiptText } from '@lucide/vue';
+import {
+    Building2,
+    ChartColumn,
+    LayoutGrid,
+    LogIn,
+    ReceiptText,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -16,6 +22,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard, login } from '@/routes';
 import { index as buildingsIndex } from '@/routes/buildings';
+import { index as reportsIndex } from '@/routes/reports';
 import { index as tariffsIndex } from '@/routes/tariffs';
 import type { NavItem } from '@/types';
 
@@ -37,6 +44,11 @@ const mainNavItems: NavItem[] = [
         title: 'Tariffs',
         href: tariffsIndex(),
         icon: ReceiptText,
+    },
+    {
+        title: 'Reports',
+        href: reportsIndex(),
+        icon: ChartColumn,
     },
 ];
 </script>

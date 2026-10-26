@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Building2, LayoutGrid, Menu, ReceiptText, Search } from '@lucide/vue';
+import {
+    Building2,
+    ChartColumn,
+    LayoutGrid,
+    Menu,
+    ReceiptText,
+    Search,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -30,6 +37,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { dashboard, login } from '@/routes';
 import { index as buildingsIndex } from '@/routes/buildings';
+import { index as reportsIndex } from '@/routes/reports';
 import { index as tariffsIndex } from '@/routes/tariffs';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
@@ -63,6 +71,11 @@ const mainNavItems: NavItem[] = [
         title: 'Tariffs',
         href: tariffsIndex(),
         icon: ReceiptText,
+    },
+    {
+        title: 'Reports',
+        href: reportsIndex(),
+        icon: ChartColumn,
     },
 ];
 </script>
