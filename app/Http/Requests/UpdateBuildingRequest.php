@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\BuildingType;
+use App\State;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBuildingRequest extends FormRequest
 {
@@ -23,7 +26,11 @@ class UpdateBuildingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'customer_name' => ['required', 'string', 'max:255'],
+            'type' => ['required', Rule::enum(BuildingType::class)],
+            'month' => ['required', 'integer', 'min:1', 'max:12'],
+            'usability' => ['required', 'numeric'],
+            'state' => ['required', Rule::enum(State::class)]
         ];
     }
 }
